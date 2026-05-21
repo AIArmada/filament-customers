@@ -132,15 +132,17 @@ FilamentCustomersPlugin::make()
 #### Change Limit
 
 ```php
-use AIArmada\FilamentCustomers\Widgets\TopCustomersWidget;
+use AIArmada\CommerceSupport\Support\Filament\OwnerUiScope;
+use AIArmada\Customers\Models\Customer;
+use AIArmada\FilamentCustomers\Widgets\RecentCustomersWidget;
 
-class CustomRecentCustomersWidget extends TopCustomersWidget
+class CustomRecentCustomersWidget extends RecentCustomersWidget
 {
     public function table(Table $table): Table
     {
         return parent::table($table)
             ->query(
-                CustomersOwnerScope::applyToOwnedQuery(Customer::query())
+                OwnerUiScope::apply(Customer::query(), includeGlobal: false)
                     ->latest()
                     ->limit(20) // Show 20
             );
@@ -151,7 +153,7 @@ class CustomRecentCustomersWidget extends TopCustomersWidget
 #### Change Sort Order
 
 ```php
-class CustomRecentCustomersWidget extends TopCustomersWidget
+class CustomRecentCustomersWidget extends RecentCustomersWidget
 {
     protected static ?int $sort = 10; // Move to bottom
 }
@@ -165,7 +167,7 @@ class CustomRecentCustomersWidget extends TopCustomersWidget
 namespace App\Filament\Widgets;
 
 use AIArmada\Customers\Models\Customer;
-use AIArmada\FilamentCustomers\Support\CustomersOwnerScope;
+use AIArmada\CommerceSupport\Support\Filament\OwnerUiScope;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -173,9 +175,7 @@ class CustomCustomerWidget extends BaseWidget
 {
     protected function getStats(): array
     {
-        $query = CustomersOwnerScope::applyToOwnedQuery(
-            Customer::query()
-        );
+        $query = OwnerUiScope::apply(Customer::query(), includeGlobal: false);
         
         $active = $query->clone()->where('status', 'active')->count();
         $marketing = $query->clone()->where('accepts_marketing', true)->count();
@@ -199,7 +199,7 @@ class CustomCustomerWidget extends BaseWidget
 namespace App\Filament\Widgets;
 
 use AIArmada\Customers\Models\Customer;
-use AIArmada\FilamentCustomers\Support\CustomersOwnerScope;
+use AIArmada\CommerceSupport\Support\Filament\OwnerUiScope;
 use Filament\Tables;
 use Filament\Widgets\TableWidget as BaseWidget;
 
@@ -213,7 +213,7 @@ class RecentCustomersWidget extends BaseWidget
     {
         return $table
             ->query(
-                CustomersOwnerScope::applyToOwnedQuery(Customer::query())
+                OwnerUiScope::apply(Customer::query(), includeGlobal: false)
                     ->latest()
                     ->limit(5)
             )
@@ -237,7 +237,7 @@ class RecentCustomersWidget extends BaseWidget
 namespace App\Filament\Widgets;
 
 use AIArmada\Customers\Models\Customer;
-use AIArmada\FilamentCustomers\Support\CustomersOwnerScope;
+use AIArmada\CommerceSupport\Support\Filament\OwnerUiScope;
 use Filament\Widgets\ChartWidget;
 
 class CustomerGrowthChart extends ChartWidget
@@ -248,7 +248,7 @@ class CustomerGrowthChart extends ChartWidget
     {
         $last6Months = collect(range(5, 0))->map(function ($monthsAgo) {
             $date = now()->subMonths($monthsAgo);
-            $count = CustomersOwnerScope::applyToOwnedQuery(Customer::query())
+            $count = OwnerUiScope::apply(Customer::query(), includeGlobal: false)
                 ->whereYear('created_at', $date->year)
                 ->whereMonth('created_at', $date->month)
                 ->count();
@@ -284,9 +284,9 @@ class CustomerGrowthChart extends ChartWidget
 **Always** apply owner scoping to widget queries:
 
 ```php
-use AIArmada\FilamentCustomers\Support\CustomersOwnerScope;
+use AIArmada\CommerceSupport\Support\Filament\OwnerUiScope;
 
-$query = CustomersOwnerScope::applyToOwnedQuery(Customer::query());
+$query = OwnerUiScope::apply(Customer::query(), includeGlobal: false);
 ```
 
 ### Performance
@@ -340,7 +340,7 @@ public function panel(Panel $panel): Panel
 {
     return $panel->widgets([
         CustomerStatsWidget::class,
-        TopCustomersWidget::class,
+        RecentCustomersWidget::class,
         CustomCustomerWidget::class,
     ]);
 }
