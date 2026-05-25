@@ -1,8 +1,10 @@
 ---
-title: Resources
+title: Usage
 ---
 
-# Resources
+# Usage
+
+This guide focuses on the shipped resources, relation managers, and the common admin workflows they expose.
 
 The plugin provides two main resources for managing customers and segments.
 
