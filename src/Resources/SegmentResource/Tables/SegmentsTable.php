@@ -15,9 +15,9 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
@@ -52,8 +52,8 @@ final class SegmentsTable
                 TextColumn::make('deactivated_at')
                     ->label('Status')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => $state === null ? 'Active' : 'Deactivated')
-                    ->color(fn ($state) => $state === null ? 'success' : 'danger'),
+                    ->formatStateUsing(fn ($state): string => $state === null ? 'Active' : 'Deactivated')
+                    ->color(fn ($state): string => $state === null ? 'success' : 'danger'),
 
                 TextColumn::make('priority')
                     ->label('Priority')
@@ -79,14 +79,17 @@ final class SegmentsTable
                     ->trueLabel('Automatic')
                     ->falseLabel('Manual'),
 
-                TernaryFilter::make('deactivated_at')
+                SelectFilter::make('status')
                     ->label('Status')
-                    ->trueLabel('Active')
-                    ->falseLabel('Deactivated')
-                    ->queries(
-                        true: fn (Builder $query) => $query->whereNull('deactivated_at'),
-                        false: fn (Builder $query) => $query->whereNotNull('deactivated_at'),
-                    ),
+                    ->options([
+                        'active' => 'Active',
+                        'deactivated' => 'Deactivated',
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => match ($data['value'] ?? null) {
+                        'active' => $query->whereNull('deactivated_at'),
+                        'deactivated' => $query->whereNotNull('deactivated_at'),
+                        default => $query,
+                    }),
             ])
             ->actions([
                 ViewAction::make(),
