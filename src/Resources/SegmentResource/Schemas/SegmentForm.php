@@ -9,11 +9,11 @@ use AIArmada\Customers\Enums\CustomerStatus;
 use AIArmada\Customers\Enums\SegmentType;
 use AIArmada\Customers\Models\Customer;
 use AIArmada\Customers\Models\Segment;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
@@ -129,12 +129,9 @@ final class SegmentForm
                     ->schema([
                         Section::make('Settings')
                             ->schema([
-                                Placeholder::make('status')
-                                    ->label('Status')
-                                    ->content(fn (?Segment $record): string => $record?->getAttribute('deactivated_at') === null
-                                        ? 'Active'
-                                        : sprintf('Deactivated on %s', $record->getAttribute('deactivated_at')->format('d M Y H:i'))
-                                    ),
+                                DateTimePicker::make('deactivated_at')
+                                    ->label('Deactivated At')
+                                    ->helperText('Set a date to deactivate. Leave empty for active.'),
 
                                 TextInput::make('priority')
                                     ->label('Priority')
