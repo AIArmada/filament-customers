@@ -61,7 +61,7 @@ Contact methods are edited in the Contact Methods relation manager supplied by
 
 **Status Sidebar:**
 ```php
-- Status dropdown (Active/Inactive/Suspended/Pending)
+- Status dropdown (Active/Inactive/Suspended/Pending Verification)
 ```
 
 **Segments Sidebar:**
@@ -153,7 +153,7 @@ The Segment Resource manages customer segmentation with support for automatic ru
 - Type badge (Loyalty, Behavior, Demographic, Custom)
 - Customer count (relation count)
 - Automatic indicator (boolean icon)
-- Status badge (Active/Deactivated)
+- Active indicator (boolean icon)
 - Priority (sortable, hidden by default)
 - Created date (hidden by default)
 
@@ -166,8 +166,7 @@ The Segment Resource manages customer segmentation with support for automatic ru
 - View segment
 - Edit segment
 - Rebuild (automatic segments only)
-
-Delete is a bulk action only; there is no per-row delete.
+- Delete segment
 
 ### Form View
 
@@ -189,14 +188,12 @@ Delete is a bulk action only; there is no per-row delete.
 
 **Available Condition Fields:**
 - Accepts Marketing (boolean)
-- Customer Status (Active/Inactive/Suspended/Pending Verification)
-- Days Since Registration (numeric)
-
-Any other field name matches nothing, so the segment resolves to zero members.
+- Customer Status
+- Customer for X Days (days since registration)
 
 **Settings Sidebar:**
 ```php
-- Deactivated At (datetime; leave empty for active)
+- Active (toggle, default true)
 - Priority (numeric, for pricing)
 ```
 
@@ -263,15 +260,8 @@ use AIArmada\FilamentCustomers\Resources\CustomerResource as BaseCustomerResourc
 class CustomerResource extends BaseCustomerResource
 {
     // Override navigation
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Sales';
-    }
-
-    public static function getNavigationSort(): ?int
-    {
-        return 5;
-    }
+    protected static ?string $navigationGroup = 'Sales';
+    protected static ?int $navigationSort = 5;
     
     // Add custom columns
     public static function table(Table $table): Table

@@ -59,6 +59,7 @@ Use this package when you need panel resources and dashboard widgets for custome
 - **Automatic/Manual**: Support for both rule-based and manual segments
 - **Condition Builder**: Visual interface for segment rules
 - **Rebuild Actions**: One-click segment rebuilding
+- **Member Preview**: See segment members before saving
 
 ### Relation Managers
 - **Addresses**: Manage customer addresses inline
@@ -102,7 +103,7 @@ The plugin follows Filament best practices:
 ## Requirements
 
 - PHP 8.4+
-- Filament ^5.8.1
+- Filament 5.6+
 - aiarmada/customers package
 
 ## Read next

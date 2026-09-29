@@ -109,8 +109,7 @@ The Recent Customers Widget shows a list of recently registered customers.
 
 - **Customer**: Name with primary Contacting email description
 - **Status**: Customer status badge
-- **Marketing**: Whether accepts marketing (boolean icon)
-- **Segments**: Segment names as badges
+- **Marketing**: Whether accepts marketing
 - **Joined**: Registration date
 
 ### Features
@@ -293,16 +292,12 @@ $query = OwnerUiScope::apply(Customer::query(), includeGlobal: false);
 For expensive queries, use caching:
 
 ```php
-use AIArmada\CommerceSupport\Support\OwnerCache;
-use AIArmada\CommerceSupport\Support\OwnerContext;
-
 protected function getStats(): array
 {
-    return OwnerCache::remember(
-        OwnerContext::resolve(),
-        'customer-stats',
+    return cache()->remember(
+        'customer-stats-' . OwnerContext::resolve()?->getKey(),
         now()->addMinutes(5),
-        fn (): array => $this->calculateStats(),
+        fn () => $this->calculateStats()
     );
 }
 ```

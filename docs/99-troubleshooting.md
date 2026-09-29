@@ -256,7 +256,7 @@ protected function getStats(): array
 // Instead of loading all records
 $stats = Customer::query()
     ->selectRaw('COUNT(*) as total')
-    ->selectRaw('SUM(CASE WHEN accepts_marketing THEN 1 ELSE 0 END) as opted_in')
+    ->selectRaw("SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active")
     ->first();
 ```
 
@@ -285,8 +285,9 @@ php artisan customers:rebuild-segments --dry-run
 
 3. **Optimize segment conditions**:
 ```php
-// Only accepts_marketing, status, and created_days_ago are supported fields.
-// An unknown field matches nothing and empties the segment.
+// Use supported fields in conditions
+// Supported: accepts_marketing, status, created_days_ago
+// Avoid: metadata, custom JSON fields
 ```
 
 ## Debugging Tips

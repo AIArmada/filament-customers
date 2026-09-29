@@ -7,7 +7,7 @@ title: Installation
 ## Requirements
 
 - PHP 8.4+
-- Filament ^5.8.1
+- Filament 5.6+
 - aiarmada/customers package
 
 ## Composer Installation
@@ -63,15 +63,11 @@ Visit your Filament admin panel. You should see:
 
 ## Configuration surface
 
-`filament-customers` publishes `config/filament-customers.php`. Publish it with:
+`filament-customers` publishes `config/filament-customers.php` for navigation and optional page toggles (see [Configuration](03-configuration.md)). Further configuration happens through:
 
-```bash
-php artisan vendor:publish --tag=filament-customers-config
-```
-
-It controls the navigation group, the resource/page navigation sorts, and the
-optional page toggles (`features.merge_customers`, `features.segment_rebuild`,
-`features.address_validation`). Domain settings stay in `config/customers.php`.
+- panel plugin registration with `FilamentCustomersPlugin::make()`,
+- extending or replacing the package resources/widgets in your application,
+- core package settings in `config/customers.php`.
 
 ## Default Configuration
 
@@ -92,15 +88,9 @@ use AIArmada\FilamentCustomers\Resources\CustomerResource;
 
 class CustomCustomerResource extends CustomerResource
 {
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Sales';
-    }
-
-    public static function getNavigationSort(): ?int
-    {
-        return 10;
-    }
+    protected static ?string $navigationGroup = 'Sales';
+    
+    protected static ?int $navigationSort = 10;
 }
 ```
 
@@ -145,19 +135,15 @@ If using multi-tenancy, ensure your application resolves owner context before th
 Create a test customer to verify installation:
 
 ```php
-use AIArmada\Customers\Enums\CustomerStatus;
+use AIArmada\Contacting\Data\ContactMethodData;
 use AIArmada\Customers\Models\Customer;
 
 $customer = Customer::create([
     'first_name' => 'Test',
     'last_name' => 'Customer',
-    'company' => 'Test Co',
 ]);
 
-// `email` and contact details are owned by Contacting, not by the customers table.
-// `status` is not fillable and is cast to the CustomerStatus enum:
-$customer->status = CustomerStatus::Active;
-$customer->save();
+$customer->addContactMethod(ContactMethodData::email('test@example.com'));
 ```
 
 Then visit the Customers resource in your Filament panel.
